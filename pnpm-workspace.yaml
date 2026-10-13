@@ -1,5 +1,8 @@
 allowBuilds:
+  bufferutil: false
+  es5-ext: false
   esbuild: true
   sharp: true
   unrs-resolver: true
+  utf-8-validate: false
   workerd: true

@@ -11,7 +11,7 @@ Halaman awal login Google, dashboard setelah login, filter keyword/kategori/prio
 
 Investigasi IPv4: [Shodan](https://developer.shodan.io/api), [Recorded Future](https://docs.recordedfuture.com/reference/ip-lookup), [AbuseIPDB](https://docs.abuseipdb.com/), [AlienVault OTX](https://github.com/AlienVault-OTX/OTX-Python-SDK), dan [VirusTotal](https://docs.virustotal.com/reference/ip-info). Key masing-masing sumber diatur di server; status konfigurasi tidak berarti API sudah diuji. Penyedia tanpa key atau gagal akan menampilkan status sendiri. Langganan dan kuota tetap mengikuti penyedia.
 
-Pencarian sosial: keyword melalui API Bluesky dan X, maksimum 30 posting, ekspor serta riwayat pribadi tersimpan di database. Ini pencarian satu kali, bukan crawler terjadwal. Endpoint publik Bluesky dapat membatasi pencarian atau mewajibkan autentikasi; aplikasi menampilkan kegagalan sumber tanpa data buatan. X memerlukan bearer token dengan izin recent search. Platform lain memerlukan adapter API tambahan; tidak mengambil posting privat.
+Pencarian sosial hosting mandiri: keyword melalui API X dan posting channel publik Telegram, maksimum 30 hasil, ekspor serta riwayat pribadi tersimpan di database. Koleksi Telegram dijadwalkan setiap 5 menit; pencarian X dijalankan saat diminta. Endpoint publik Bluesky dapat membatasi pencarian atau mewajibkan autentikasi; aplikasi menampilkan kegagalan sumber tanpa data buatan. X memerlukan bearer token dengan izin recent search. Konfigurasi Telegram dijelaskan di bagian Telegram publik dan X; tidak mengambil posting privat.
 
 ## Jalankan aplikasi Google
 
@@ -83,3 +83,24 @@ Tambahkan sumber pada daftar `providers` dan implementasikan adapter server pada
 ## Sites preview
 
 Manifest `.openai/hosting.json` dan migrasi `drizzle/` adalah konfigurasi target Sites. Sumber hosting mandiri berdiri sendiri dan tidak menggunakan autentikasi ChatGPT. Situs publik hanya menampilkan data contoh sampai pengguna memilih sumber CISA. Identitas Google, API key, dan sesi hosting mandiri tidak dikirim ke Sites.
+
+
+## Telegram publik dan X (Railway)
+
+- `X_BEARER_TOKEN`: token X Developer dengan akses recent search. Maksimum 30 posting; kuota dan biaya mengikuti akun X.
+- `TELEGRAM_PUBLIC_CHANNELS`: username channel publik dipisahkan koma, tanpa URL; default `breachdetect`. Set kosong untuk menghentikan koleksi. Maksimum 10 channel.
+- Telegram tidak memerlukan bot atau login. Collector membaca posting teks yang tersedia di `https://t.me/s/<username>` setiap 5 menit. Ini bukan Telegram API dan bukan pencarian seluruh Telegram/seluruh riwayat. Perubahan HTML, pembatasan jaringan atau halaman preview yang tidak tersedia akan ditampilkan sebagai error; data contoh tidak digunakan sebagai pengganti.
+- Pesan pribadi dan grup privat tidak diakses. Konten X dan Telegram tersimpan maksimum 30 hari/5.000 posting, dapat dibaca analis terdaftar. Riwayat pencarian tetap per akun.
+- Cyber trends → Sinkronkan data memuat CISA dan sinyal sosial yang tersimpan. Kategori Social signal, tingkat Unverified, wilayah Belum diketahui. Klaim sosial bukan bukti insiden.
+- IPv4 dan CVE diekstrak dari posting; IPv4 dapat disalin ke Investigasi IOC untuk enrichment.
+- Status Dikonfigurasi menunjukkan konfigurasi, bukan koneksi berhasil. Lihat waktu sinkronisasi dan pesan error di Social intelligence.
+
+### Telegram Client API untuk channel tanpa preview
+
+1. Buat aplikasi di https://my.telegram.org → API development tools; dapatkan api_id dan api_hash.
+2. Pada checkout lokal yang sudah terpasang dependencies, jalankan `node self-host/telegram-login.mjs`. Masukkan nomor, kode login dan password 2FA sendiri di terminal. Sesi dicetak sekali untuk Anda salin ke Railway; tidak disimpan dalam file oleh script.
+3. Railway Variables: isi `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, `TELEGRAM_SESSION`, dan `TELEGRAM_PUBLIC_CHANNELS=breachdetect`. Restart/deploy.
+4. Collector otomatis memilih Client API bila ketiga kredensial lengkap. Client API hanya membaca maksimal 50 pesan terbaru dari setiap channel dalam daftar, tanpa auto-join, mengirim pesan atau mengubah akun.
+5. Sesi memberi akses akun Telegram; simpan sebagai secret hosting, jangan di GitHub/chat. Gunakan akun khusus pemantauan bila tersedia dan cabut sesi melalui Telegram Settings → Devices saat tidak dipakai.
+
+Library: https://docs.teleproto.dev/authentication. Client API belum dapat diuji langsung tanpa kredensial akun Anda.
