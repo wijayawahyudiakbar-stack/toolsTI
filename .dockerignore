@@ -1,0 +1,9 @@
+node_modules
+.git
+.env*
+self-host/.env*
+self-host/data
+self-host/public
+.wrangler
+.sites-runtime
+dist
