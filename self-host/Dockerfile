@@ -13,5 +13,4 @@ RUN mkdir data && chown -R node:node /app
 USER node
 ENV PORT=3000
 EXPOSE 3000
-VOLUME ["/app/data"]
 CMD ["node", "--env-file-if-exists=.env", "server.mjs"]
