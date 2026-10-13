@@ -1,5 +1,6 @@
 // Run this script yourself; never paste login codes, passwords, or the session into chat.
 // Use ws pure JavaScript fallback; do not load optional native addons.
+process.env.CIFRANTE_NATIVE='0';
 process.env.WS_NO_BUFFER_UTIL='1';
 process.env.WS_NO_UTF_8_VALIDATE='1';
 const {TelegramClient}=await import('teleproto');
