@@ -8,7 +8,7 @@ RUN pnpm exec vite build --config self-host/vite.config.ts
 FROM node:22-slim
 WORKDIR /app
 COPY --from=build /app/self-host/public ./public
-COPY self-host/server.mjs self-host/google-auth.mjs ./
+COPY self-host/server.mjs self-host/google-auth.mjs self-host/intelligence.mjs ./
 RUN mkdir data && chown -R node:node /app
 USER node
 ENV PORT=3000
