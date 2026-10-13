@@ -8,7 +8,8 @@ RUN pnpm exec vite build --config self-host/vite.config.ts
 FROM node:22-slim
 WORKDIR /app
 COPY --from=build /app/self-host/public ./public
-COPY self-host/server.mjs self-host/google-auth.mjs self-host/intelligence.mjs self-host/social.mjs ./
+COPY --from=build /app/node_modules ./node_modules
+COPY self-host/server.mjs self-host/google-auth.mjs self-host/intelligence.mjs self-host/social.mjs self-host/telegram-client.mjs ./
 RUN mkdir data && chown -R node:node /app
 USER node
 ENV PORT=3000
